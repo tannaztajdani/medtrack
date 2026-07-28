@@ -1,59 +1,91 @@
 package com.medtrack.dto;
+
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDateTime;
-public class CreateMedicalReportRequest implements MedicalReportRequest {
-    @NotNull
+
+public class CreateMedicalReportRequest {
+
+    @NotNull(message = "Patient ID is required")
+    @Positive(message = "Patient ID must be a positive number")
     private Long patientId;
 
+    @Positive(message = "Doctor ID must be a positive number")
     private Long doctorId;
 
-    @NotBlank
+    @NotBlank(message = "Report type is required")
     private String reportType;
 
-    @NotBlank
+    @NotBlank(message = "Title is required")
+    @Size(min = 2, max = 100, message = "Title must be between 2 and 100 characters")
     private String title;
 
+    @Size(max = 1000, message = "Description cannot exceed 1000 characters")
     private String description;
 
-    @NotBlank
+    @NotBlank(message = "File URL is required")
+    @Size(max = 500, message = "File URL cannot exceed 500 characters")
+    @Pattern(
+            regexp = "^(https?://).+",
+            message = "File URL must be a valid HTTP or HTTPS URL"
+    )
     private String fileUrl;
 
-    @NotNull
+    @NotNull(message = "Report date is required")
     private LocalDateTime reportDate;
 
-    @Override
     public Long getPatientId() {
         return patientId;
     }
 
-    @Override
     public Long getDoctorId() {
         return doctorId;
     }
 
-    @Override
     public String getReportType() {
         return reportType;
     }
 
-    @Override
     public String getTitle() {
         return title;
     }
 
-    @Override
     public String getDescription() {
         return description;
     }
 
-    @Override
     public String getFileUrl() {
         return fileUrl;
     }
 
-    @Override
     public LocalDateTime getReportDate() {
         return reportDate;
     }
-}
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
+    }
 
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public void setReportDate(LocalDateTime reportDate) {
+        this.reportDate = reportDate;
+    }
+}

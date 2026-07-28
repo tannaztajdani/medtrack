@@ -1,5 +1,5 @@
 package com.medtrack.service;
-import org.springframework.stereotype.Service;
+
 import com.medtrack.dto.CreateMedicalReportRequest;
 import com.medtrack.dto.MedicalReportResponse;
 import com.medtrack.entity.Doctor;
@@ -9,12 +9,12 @@ import com.medtrack.enums.ReportType;
 import com.medtrack.repository.DoctorRepository;
 import com.medtrack.repository.MedicalReportRepository;
 import com.medtrack.repository.PatientRepository;
-import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-@Service
 
+@Service
 public class MedicalReportService {
+
     private final MedicalReportRepository medicalReportRepository;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
@@ -28,8 +28,10 @@ public class MedicalReportService {
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
     }
+
     @Transactional
     public MedicalReportResponse create(CreateMedicalReportRequest request) {
+
         Patient patient = patientRepository.findByIdOrThrow(request.getPatientId());
 
         Doctor doctor = null;
@@ -40,14 +42,27 @@ public class MedicalReportService {
         MedicalReport report = new MedicalReport();
         report.setPatient(patient);
         report.setDoctor(doctor);
-        report.setReportType(ReportType.valueOf(request.getReportType()));
+
+        try {
+            report.setReportType(ReportType.valueOf(request.getReportType()));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid report type: " + request.getReportType());
+        }
+
         report.setTitle(request.getTitle());
         report.setDescription(request.getDescription());
         report.setFileUrl(request.getFileUrl());
         report.setReportDate(request.getReportDate());
 
         report = medicalReportRepository.saveAndFlush(report);
+
+        return toResponse(report);
+    }
+
+    private MedicalReportResponse toResponse(MedicalReport report) {
+
         MedicalReportResponse response = new MedicalReportResponse();
+
         response.setId(report.getId());
         response.setPatientId(report.getPatient().getId());
 
@@ -64,6 +79,5 @@ public class MedicalReportService {
         response.setUpdatedAt(report.getUpdatedAt());
 
         return response;
-
     }
 }
